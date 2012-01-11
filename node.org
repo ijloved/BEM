@@ -1,0 +1,362 @@
+* Node class
+  This class is made to store the information of coordinates of nodes.
+  Written by IkJung Yun. <2012-01-11 수>
+  ijloved At Gmail Dot Com.
+
+* Members
+**  static int m\_ticket:
+    number of created instance, initialized as zero in node.cpp
+    This value is not unique. Because destuction of instance reduce the ticket by onem on the
+    other hand creation of instance add the ticket by one.
+**  static const int n\_dof = two:
+    number of degree of freedom, two is defined enum \_LOC\_TAG (temporarily)
+**  static string m\_name
+    node class's name, initialized as "NODE" in node.cpp
+**  int m\_id:
+    node id, is used to identified the instance of node.
+    This value is no unique, it can be duplicated by copy or assignment operator(=).
+    If two instances have same id number then the position of instances is also same. However
+    converse does not satisfied. 
+**  DATA\_TYPE m\_pos[n\_dof]:
+    contains the position data of nodes. its dimension depends on the
+    degree of freedom of analysis.
+
+
+* Member Functions
+
+** Constructor
+*** Node(void):
+    Default Constructor
+    1- increase m\_ticket by one
+    2- set m\_id equal to m\_ticket
+    3- initialize m\_pos as zero.
+*** Node(const DATA\_TYPE * const pos):
+    Second constructor has a parameter, which points the array of DATA\_TYPE. This constructor
+    doesn't check the dimension of an inputed array.  
+    - The only difference to the default constructor is initializing m\_pos with a input
+      parameter not zero.
+*** Node(const Node & target):
+    Copy Constructor
+    - If some instances use this function, then member id has a same value to the original
+      instance.
+
+** Destructor
+*** virtual ~Node(void){--m\_ticket;}
+    Destructor - nothing but declared as virtual for later use.
+
+** Function Overloading
+*** virtual bool operator == (const Node & target):
+    if m_id and m_pos is same (not address but value), return true else return false
+*** virtual Node & operator = (const Node & target):
+    This operator used in Copy Constructor, m_id and m_pos is modifed to have a same value of target.
+
+** get functions
+*** static const int get\_ticket(void) {return m\_ticket;}:
+    return ticket number of node.
+*** static const int get\_dof(void) {return n\_dof;}:
+    return the number of DOF.
+*** static const string & get\_name(void) {return m\_name;}:
+    return the name of class.
+
+*** const int get\_id(void) const {return m\_id;}:
+    return node id
+*** const DATA\_TYPE get\_pos(const int loc) const { return m\_pos[loc];}:
+    return the coordinate of the node.
+
+** set functions
+*** void set\_pos(const BEM\_LOC loc, const DATA\_TYPE val){m\_pos[loc] =val;}:
+    change the coordinate of node.
+
+*** static ostream & info\_class(ostream & os = cout):
+    print total number of created node which is existing and analysis dimension.
+*** ostream & info(ostream & os = cout):
+    print a id number and coordinates of a specific node instance
+    using formatted data such as %d node posintion [ %4f, %4f, %4f ].
+
+* [[./node.h ][node.h]] 
+#+BEGIN_SRC C++
+// KEEPER_BEM_NODE -- a class to handle the coordinate of node.
+//
+// Author: IkJung Yun
+
+// Written from 2012.01.10.
+
+#include <iostream>
+#include <string.h>
+#include <string>
+#include <stdlib.h>
+
+using std::cout;
+using std::endl;
+using std::string;
+using std::ostream;
+
+#ifndef BEM_NODE_H_
+#define BEM_NODE_H_
+
+namespace BEM_NODE{
+
+  // This variable is declared here temporarily.
+  // As more classes is implemented, it will be moved to more proper class.
+  // Tentatively, I think a header file having the definition of constants will be required.
+  typedef double DATA_TYPE;
+
+  // degree of freedom
+  typedef enum _DOF_TAG{one = 1, two = 2, three = 3} BEM_DOF;
+  // coordinates
+  typedef enum _LOC_TAG{x = 0, y = 1, z = 2} BEM_LOC;
+
+  inline const char *  string_location(BEM_LOC loc) {
+    static const char * const m_x = "x";
+    static const char * const m_y = "y";
+    static const char * const m_z = "z";
+    switch(loc){
+    case x :
+      return m_x;
+    case y :
+      return m_y;
+    case z :
+      return m_z;
+    default:
+      cout << "Error: Analysis dimension should be less than 3 dimension, "
+           << "current dimension is " << loc << endl;
+      exit(8);
+    }
+    cout << "Internal failure is occured in string_location(BEM_LOC loc)" << endl;
+    exit(8);
+    return NULL; // never reached this points
+  }
+
+
+  class Node{
+  private :
+
+    static int m_ticket;      // number of created instance
+    static const int n_dof = two;      // number of degree of freedom
+
+    static string m_name ;
+
+
+    int m_id;     // node id, not unique value but if two instances have same id number then
+                  // the position of instances is also same. However converse does not satisfied.
+
+    // m_pos contains the position data of nodes.
+    // its dimension depends on the degree of freedom of analysis.
+    DATA_TYPE m_pos[n_dof];
+
+    //  protected :
+
+    // these pointers to point linked elements
+    // however, currently not used.
+    // AML_LList m_in_links;
+    // AML_LList m_out_links;
+
+
+  public :
+    // Default Constructor
+    // 1- increase m_ticket by one
+    // 2- set m_id equal to m_ticket
+    // 3- initialize m_pos as zero.
+    Node(void) : m_id(++m_ticket){
+      for(int i=0; i<n_dof;++i)
+        *(m_pos+i)= 0.0;
+    }
+
+    // Constructor 2
+    // 3 --> Input coordinates data as a parameter
+    // Warning : This constructor doesn't check the dimension of an inputted array.
+    Node(const DATA_TYPE * const pos) : m_id(++m_ticket){
+      for(int i=0;i<n_dof;++i){
+        *(m_pos+i) = *(pos+i); // cout << " " << i << " th compo value : " << *(m_pos+i) << endl;
+      }
+    }
+
+    // Copy Constructor
+    Node(const Node & target) {
+      ++m_ticket;
+      *this = target; // use operator =
+    }
+
+    // Operator overloading for =
+    virtual Node & operator = (const Node & target){
+      m_id = target.m_id;
+      for(int i=0;i<n_dof;++i )
+        *(m_pos+i) = *(target.m_pos+i);
+      return (*this);
+    }
+
+    // Operator overloading for ==
+    virtual bool operator == (const Node & target){
+      if(m_id != target.m_id)
+        return false;
+      for(int i=0;i<n_dof;++i )
+        if(*(m_pos+i) != *(target.m_pos+i))
+          return false;
+
+      return (true);
+    }
+
+
+    // Destructor - nothing but declared as virtual for later use.a
+    virtual ~Node(void){--m_ticket;}
+
+    // get functions
+    static const int get_ticket(void) {return m_ticket;} // return ticket number of node
+    static const int get_dof(void) {return n_dof;} // return the number of DOF.
+    static const string & get_name(void) {return m_name;} //return the name of class
+
+    const int get_id(void) const {return m_id;} // return node id
+
+    const DATA_TYPE get_pos(const int loc) const { return m_pos[loc];} // return the coordinate
+                                                                       // of the node.
+    // set functions
+    void set_pos(const BEM_LOC loc, const DATA_TYPE val){
+      if(loc>=n_dof){
+        cout << "Error: " << string_location(loc) << " is not in the bound of analysis dimension" << endl;
+        exit(8);
+      }
+      m_pos[loc] =val;
+    } // change the coordinate of node
+
+    static ostream & info_class(ostream & os = cout); // print total number of created node
+                                                      // which is existing and analysis dimension
+
+    ostream & info(ostream & os = cout);              // print node id and coordinate
+
+    // // Links
+    // AML_LList* Get_In_Links(void){ return &m_in_links;}
+    // AML_LList* Get_Out_Links(void){ return &m_out_links;}
+
+    // // Conencting Node
+    // void Connect_to(void* by) { m_out_links.Add_After_Tail(by);}
+    // void Connect_from(void * by) { m_in_links.Add_After_Tail(by);}
+
+  };
+}
+
+#endif
+
+#+END_SRC C++
+
+
+* [[./node.cpp][node.cpp]]
+#+BEGIN_SRC C++
+#include "node.h"
+#include <iomanip>
+
+using namespace BEM_NODE;
+using std::setw;
+
+int Node::m_ticket = 0; // Total number of node class' instance,  this is defined as static
+
+string Node::m_name = "NODE"; // Name of class,  this is defined as static
+
+// Print total number of created node which is existing and analysis dimension.
+ostream & Node::info_class(ostream & os){
+  os << m_name << " class has " // Print Node name
+     << "total " << m_ticket    // Print total number of Node
+     << " node that lies in " << n_dof <<" dimension." << endl; // Print analysis dimension
+  return os;
+}
+
+// Print a id number and coordinates of a specific node instance
+// Using formatted data such as %d node position [ %4f, %4f, %4f ].
+ostream & Node::info(ostream & os){
+  os << " " << m_id << " node position [ ";
+  os << setw(4);
+  for(int i = 0; i < n_dof-1; ++i){
+    os << *(m_pos + i) << " , " ;
+  }
+  os << *(m_pos+n_dof-1) << " ]." << endl;
+  return os;
+}
+
+
+#+END_SRC C++
+
+* [[./node_test.cpp][Test]]
+#+BEGIN_SRC C++
+#include <iostream>
+#include "node.h"
+#include <fstream>
+
+using namespace std;
+
+using namespace BEM_NODE;
+
+int main(void){
+
+  cout << "This program is written to test the class BEM_NODE." << endl
+       << "Main purpose of BEM is contain the coordinate of node." << endl << endl;
+
+  fstream fout;
+  fout.open("./data.dat");
+
+  DATA_TYPE pos[3] ={10., 20., 30.};
+
+  cout << "Start" << endl;
+  Node::info_class(); // 0 ticket, 2 dof
+  cout << "Create five node instances" << endl;
+  Node my_class[5];
+  Node::info_class(); // 5 ticket, 2 dof
+
+  cout << endl << "Print information of first instance" << endl;
+  my_class[0].info(); // 1 node [ 0, 0];
+  my_class[1].info(); // 2 node [ 0, 0];
+
+  cout << endl << "Make test" << endl;
+  Node test(pos);     // second constructor
+  Node::info_class(); // 6 ticket
+  test.info();        // 6 node [10, 20];
+
+  cout << endl << "Copy test 1" << endl;
+  my_class[0] = test; // 1 node is replaced by test;
+  Node::info_class(); // 6 ticket
+  my_class[0].info(); // 6 node [10,20]
+
+  cout << endl << "Copy test2" << endl;
+  Node test1(test);   // Copy constructor
+  Node::info_class(); // 7 ticket
+  test1.info();       // 6 node [10, 20]
+
+  cout << endl << "Print Information Table in \"./data.dat\"" << endl;
+  for(int i=0; i < 5;++i)
+    my_class[i].info(fout); // check ./data.dat
+
+  cout << endl << "Print Information Table in screen" << endl;
+  for(int i=0; i < 5;++i)
+    my_class[i].info(cout); // compare the result with the one in ./data.dat
+
+  cout << endl << "Ticket Test" << endl;
+  {
+    Node temp;
+    Node::info_class(); // increase ticket to 8
+  }
+  Node::info_class(); // decrease ticket to 7 because local variable was gone.
+
+  cout << endl << "set_pos Test" << endl;
+  my_class[2].set_pos(x,100);
+  //my_class[2].info(fout);
+  my_class[2].info();
+  my_class[2].set_pos(y,200);
+  //my_class[2].info(fout);
+  my_class[2].info();
+  //my_class[2].set_pos(z,200); // if this line is un-commented, error will occur. Analysis
+                              // dimension is set to two, currently.
+  //my_class[2].info(fout);
+  //my_class[2].info();
+
+  cout << endl << "get function tests " << endl;
+  for(int i=0;i<5;i++){
+    cout << "Class " << my_class[i].get_name() << " ID " << my_class[i].get_id()
+         << " node's ticket number is " << my_class[i].get_ticket() << " and its coordinates : " << endl;
+    for(int j=0; j < my_class[i].get_dof(); j++)
+      cout << my_class[i].get_pos(j) << " ";
+    cout << endl;
+  }
+
+
+  return 0;
+}
+
+#+END_SRC C++
