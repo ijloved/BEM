@@ -4,15 +4,15 @@
   ijloved At Gmail Dot Com.
 
 * Members
-**  static int m\_ticket:
+**  static unsigned int m\_ticket:
     number of created instance, initialized as zero in node.cpp
     This value is not unique. Because destuction of instance reduce the ticket by onem on the
     other hand creation of instance add the ticket by one.
-**  static const int n\_dof = two:
+**  static const int n\_dof = two_D:
     number of degree of freedom, two is defined enum \_LOC\_TAG (temporarily)
 **  static string m\_name
     node class's name, initialized as "NODE" in node.cpp
-**  int m\_id:
+**  unsigned int m\_id:
     node id, is used to identified the instance of node.
     This value is no unique, it can be duplicated by copy or assignment operator(=).
     If two instances have same id number then the position of instances is also same. However

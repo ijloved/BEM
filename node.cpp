@@ -4,7 +4,7 @@
 using namespace BEM_NODE;
 using std::setw;
 
-int Node::m_ticket = 0; // Total number of node class' instance,  this is defined as static
+unsigned int Node::m_ticket = 0; // Total number of node class' instance,  this is defined as static
 
 string Node::m_name = "NODE"; // Name of class,  this is defined as static
 

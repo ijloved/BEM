@@ -25,7 +25,8 @@ namespace BEM_NODE{
   typedef double DATA_TYPE;
 
   // degree of freedom
-  typedef enum _DOF_TAG{one = 1, two = 2, three = 3} BEM_DOF;
+  typedef enum _DOF_TAG{one_D = 1, two_D = 2, three_D = 3} BEM_DOF;
+
   // coordinates
   typedef enum _LOC_TAG{x = 0, y = 1, z = 2} BEM_LOC;
 
@@ -54,13 +55,13 @@ namespace BEM_NODE{
   class Node{
   private :
 
-    static int m_ticket;      // number of created instance
-    static const int n_dof = two;      // number of degree of freedom
+    static unsigned int m_ticket;      // number of created instance
+    static const int n_dof = two_D;      // number of degree of freedom
 
     static string m_name ;
 
 
-    int m_id;     // node id, not unique value but if two instances have same id number then
+    unsigned int m_id;     // node id, not unique value but if two instances have same id number then
                   // the position of instances is also same. However converse does not satisfied.
 
     // m_pos contains the position data of nodes.
