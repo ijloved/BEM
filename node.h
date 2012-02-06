@@ -3,57 +3,26 @@
 // Author: IkJung Yun
 
 // Written from 2012.01.10.
+// Last modified at 2012.01.13
 
 #include <iostream>
 #include <string.h>
 #include <stdlib.h>
+#include "common.h"
 
 using std::cout;
 using std::endl;
 using std::string;
 using std::ostream;
+using namespace BEM_COMMON;
 
 #ifndef BEM_NODE_H_
 #define BEM_NODE_H_
 
 namespace BEM_NODE{
 
-  // This variable is declared here temporarily.
-  // As more classes is implemented, it will be moved to more proper class.
-  // Tentatively, I think a header file having the definition of constants will be required.
-  typedef double DATA_TYPE;
-
-  // degree of freedom
-  typedef enum _DOF_TAG{one_D = 1, two_D = 2, three_D = 3} BEM_DOF;
-
-  // coordinates
-  typedef enum _LOC_TAG{x = 0, y = 1, z = 2} BEM_LOC;
-
   // String Constant
   static const string node_name_2D = "2D Node Class";
-
-  inline const char *  string_location(BEM_LOC loc) {
-    static const char * const m_x = "x";
-    static const char * const m_y = "y";
-    static const char * const m_z = "z";
-    switch(loc){
-    case x :
-      return m_x;
-    case y :
-      return m_y;
-    case z :
-      return m_z;
-    default:
-      cout << "Error: Analysis dimension should be less than 3 dimension, "
-           << "current dimension is " << loc << endl;
-      exit(8);
-    }
-    cout << "Internal failure is occured in string_location(BEM_LOC loc)" << endl;
-    exit(8);
-    return NULL; // never reached this points
-  }
-
-
 
   /*
     ---------------------------------------------------------------------
@@ -78,12 +47,16 @@ namespace BEM_NODE{
     ---------------------------------------------------------------------
   */
   class Node{
+  private:
+    // print node id and coordinate
+    virtual ostream & info(ostream & os = cout){return os;}
   protected :
     // number of created instance
     static unsigned int m_ticket;
     // node id, not unique value but if two instances have same id number then the position of
     // instances is also same. However converse does not satisfied.
     unsigned int m_id;
+
 
   public :
     // Default Constructor -- increase m_ticket by one and  set m_id equal to m_ticket
@@ -104,7 +77,7 @@ namespace BEM_NODE{
         return (true);
       else return (false);
     }
-    // Destructor - nothing but declared as virtual for later use.a
+    // Destructor - nothing but declared as virtual for later use.
     virtual ~Node(void){--m_ticket;}
 
     // get functions //
@@ -114,7 +87,8 @@ namespace BEM_NODE{
 
     // set functions //
     virtual void set_pos(const BEM_LOC loc, const DATA_TYPE val) = 0;
-  };
+
+  };                            // Class Node
 
 
   /*
@@ -208,9 +182,10 @@ namespace BEM_NODE{
     // print total number of created node which is existing and analysis dimension
     static ostream & info_class(ostream & os = cout);
     // print node id and coordinate
-    ostream & info(ostream & os = cout);
+    virtual ostream & info(ostream & os = cout);
+  };                            // Class Node_2D
 
-  };
-}
+
+} // namespace BEM_NODE
 
 #endif

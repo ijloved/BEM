@@ -27,7 +27,7 @@
 |                                                                   |                                                       |
 | virtual const DATA_TYPE get_pos(const int loc) const = 0;         | const DATA_TYPE get_pos(const int loc)                |
 | virtual void set_pos(const BEM_LOC loc, const DATA_TYPE val) = 0; | void set_pos(const BEM_LOC loc, const DATA_TYPE val)  |
-| virtual ostream & info_class(ostream & os = cout) = 0;            | ostream & info_class(ostream & os = cout)             |
+|                                                                   | ostream & info_class(ostream & os = cout)             |
 | virtual ostream & info(ostream & os = cout) = 0;                  | ostream & info(ostream & os = cout)                   |
 |-------------------------------------------------------------------+-------------------------------------------------------|
 
